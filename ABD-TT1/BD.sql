@@ -1,0 +1,65 @@
+CREATE TABLE SERIE(
+    IDSerie VARCHAR2(12) NOT NULL,
+    Nombre VARCHAR2(100) NOT NULL,
+    Pais VARCHAR2(50),
+    Idioma VARCHAR2(30),
+    AnoInicio NUMERIC(4,0) NOT NULL,
+    AnoFin NUMERIC(4,0),
+    RestriccionEdad NUMERIC(2,0),
+    Genero VARCHAR2(30) NOT NULL,
+    Disponible NUMERIC(1,0) NOT NULL,
+    CONSTRAINT PK_SERIE PRIMARY KEY (IDSerie),
+    CONSTRAINT UNIQ_Nombre  UNIQUE (Nombre)
+);
+CREATE TABLE EPISODIO(
+    IDSerie VARCHAR2(12) NOT NULL,
+    NumTemporada NUMERIC(2,0) NOT NULL,
+    NumEpisodio NUMERIC(2,0) NOT NULL,
+    NombreEpis VARCHAR2(50) NOT NULL,
+    Resumen VARCHAR2(50),
+    FechaEstreno DATE,
+    Duracion NUMERIC(10,0),
+    CONSTRAINT EPISODIO_IDSERIE_FK FOREIGN KEY (IDSerie) REFERENCES SERIE (IDSerie) ON DELETE CASCADE ,
+    CONSTRAINT PK_EPISODIO PRIMARY KEY (IDSERIE,NumTemporada,NumEpisodio)
+);
+CREATE TABLE  CLIENTE(
+    CIU NUMERIC(5,0) NOT NULL,
+    DNI VARCHAR2(10) NOT NULL,
+    NombrePila VARCHAR2(40) NOT NULL,
+    Apellido1 VARCHAR2(40) NOT NULL,
+    Apellido2 VARCHAR2(40),
+    Correo VARCHAR2(50) NOT NULL,
+    Tarjeta NUMERIC(10,0) NOT NULL,
+    FechaNacimiento DATE NOT NULL,
+    Direccion VARCHAR2(150),
+    CONSTRAINT PK_CLIENTE PRIMARY KEY (CIU),
+    CONSTRAINT unique_DNI UNIQUE (DNI),
+    CONSTRAINT unique_correo UNIQUE (Correo)
+);
+
+CREATE TABLE REPRODUCCION(
+    CIU NUMERIC(5,0) NOT NULL,
+    FechaReprod DATE NOT NULL,
+    IDSerie VARCHAR2(12) NOT NULL,
+    NumTemporada NUMERIC(2,0) NOT NULL,
+    NumEpisodio NUMERIC(2,0) NOT NULL,
+    TipoDispositivo VARCHAR2(20),
+    CalificacionReprod NUMERIC(2,0),
+    TiempoRest NUMERIC(8,0),
+    CONSTRAINT fk_ciu_repro FOREIGN KEY (CIU) REFERENCES CLIENTE(CIU) ON DELETE CASCADE,
+    CONSTRAINT fk_episodio FOREIGN KEY (IDSerie,NumTemporada,NumEpisodio) REFERENCES EPISODIO(IDSerie, NumTemporada,NumEpisodio) ON DELETE CASCADE,
+    CONSTRAINT pk_reproducion PRIMARY KEY (CIU,FechaReprod,IDSerie,NumTemporada,NumEpisodio),
+    CONSTRAINT ck_calif1 CHECK ( CalificacionReprod >=0),
+    CONSTRAINT ck_calif2 CHECK ( CalificacionReprod <=10)
+);
+CREATE TABLE PAGO(
+    IDFactura VARCHAR2(15) NOT NULL,
+    FechaInicio DATE NOT NULL,
+    FechaFin DATE NOT NULL,
+    CIU NUMERIC(5,0),
+    CantAbono NUMERIC(6,2) NOT NULL,
+    FechaPago DATE NOT NULL,
+    CONSTRAINT fk_ciu_pago FOREIGN KEY (CIU) REFERENCES CLIENTE(CIU) ON DELETE SET NULL,
+    CONSTRAINT pk_pagos PRIMARY KEY (IDFactura),
+    CONSTRAINT ck_abono CHECK (CantAbono > 0 )
+);

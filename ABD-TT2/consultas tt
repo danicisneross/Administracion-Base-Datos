@@ -1,0 +1,36 @@
+-- Número de visualizaciones de series por parte de los clientes --
+SELECT s.nombre, count(*) FROM reproduccion r JOIN episodio
+ep ON r.numepisodio=ep.numepisodio
+JOIN serie s ON ep.idserie=s.idserie GROUP BY s.NOMBRE
+ORDER BY count(*) DESC
+
+-- Series en idioma español o portugues --
+SELECT nombre, ANOINICIO, ANOFIN, pais, idioma, genero FROM serie
+WHERE IDIOMA='Espanol' OR IDIOMA='Portugues'
+
+-- Cúantos episodios ha visualizado un usuario y cuanto ha pagado desde que hay registros --
+SELECT NOMBREPILA, CORREO, coalesce(CANTABONO,0) AS ABONADO, VISUALIZADOS
+FROM CLIENTE c JOIN (SELECT ciu, count(*) AS VISUALIZADOS FROM REPRODUCCION
+GROUP BY ciu) num ON c.CIU=num.CIU
+LEFT JOIN PAGO P ON c.CIU = P.CIU
+
+-- Ver cuanto cobré por mes --
+select sum(CANTABONO) as Cobrado, to_char(FECHAPAGO, 'MM/YYYY') as mes from PAGO
+where to_char(FECHAPAGO, 'YYYY') = '1996'
+group by to_char(FECHAPAGO, 'MM/YYYY')
+order by mes asc
+
+-- Ver el nombre de una serie y cuantos episodios tiene 
+
+
+-- Obtener las series que tienen mas de 3 episodios con una calificacion de reproduccion por debajo del 6 --
+SELECT DISTINCT s.IDSERIE, s.Nombre, s.Genero, r.CalificacionReprod 
+FROM Serie s 
+JOIN Episodio e ON s.IDSerie = e.IDSerie 
+JOIN Reproduccion r ON e.IDSerie = r.IDSerie AND e.NumTemporada = r.NumTemporada AND e.NumEpisodio = r.NumEpisodio 
+WHERE r.CalificacionReprod < 6;                              
+
+-- Añadimos una temporada a una serie -- 
+UPDATE Serie SET AnoFin = [CUALQUIERA] WHERE IDSerie = [dAqCVPftK]; --Puse cualquier ID... 
+UPDATE Episodio SET NumTemporada = NumTemporada + 1 WHERE IDSerie = [dAqCVPftK]; --Puse cualquier ID... 
+UPDATE Reproduccion SET NumTemporada = NumTemporada + 1 WHERE IDSerie = [dAqCVPftK]; --Puse cualquier ID... 
